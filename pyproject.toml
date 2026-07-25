@@ -13,6 +13,7 @@ dependencies = [
     "numpy>=2.0,<3",
     "plotly>=6,<7",
     "reportlab>=4,<5",
+    "kaleido>=1,<2",
 ]
 
 [project.optional-dependencies]
