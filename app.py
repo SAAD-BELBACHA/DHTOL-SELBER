@@ -160,6 +160,29 @@ summary_columns[0].metric("Pass", int(status_counts.get("Pass", 0)))
 summary_columns[1].metric("Review", int(status_counts.get("Review", 0)))
 summary_columns[2].metric("Fail", int(status_counts.get("Fail", 0)))
 
+log_gaps = [
+    (
+        board.board.key,
+        max(0.0, board.stress_seconds - board.available_log_seconds),
+    )
+    for board in result.boards
+]
+missing_log_boards = [
+    (board_key, gap_seconds)
+    for board_key, gap_seconds in log_gaps
+    if gap_seconds > settings.missing_log_warning_seconds
+]
+if missing_log_boards:
+    details = "\n".join(
+        f"- {board_key}: {gap_seconds:.0f} seconds of LOG coverage missing"
+        for board_key, gap_seconds in missing_log_boards
+    )
+    st.warning(
+        "DATA stress duration is longer than available board LOG coverage. "
+        f"Allowed difference: {settings.missing_log_warning_seconds:.0f} seconds.\n\n"
+        f"{details}"
+    )
+
 overview_rows = [
     {
         "Board": board.board.key,
@@ -168,6 +191,10 @@ overview_rows = [
         "Stress [h]": board.stress_seconds / 3600,
         "Post-stress [h]": board.post_stress_seconds / 3600,
         "Board LOG [h]": board.available_log_seconds / 3600,
+        "Missing LOG [s]": max(
+            0.0,
+            board.stress_seconds - board.available_log_seconds,
+        ),
         "Evidence": len(board.evidence),
     }
     for board in result.boards
