@@ -42,27 +42,17 @@ def _temperature_evidence(
 
     for sensor in ("t0", "t1"):
         values = pd.to_numeric(frame[sensor], errors="coerce")
-        invalid = (
-            values.isna()
-            | values.lt(settings.temperature_min_c)
-            | values.gt(settings.temperature_max_c)
-        )
+        invalid = values.isna()
 
         for index in frame.index[invalid][: settings.max_evidence_per_rule]:
             evidence.append(
                 Evidence(
                     level=Status.REVIEW,
-                    rule="temperature_bounds",
-                    reason=f"{sensor.upper()} is outside physical limits.",
+                    rule="invalid_temperature",
+                    reason=f"{sensor.upper()} is not a numeric temperature value.",
                     source_path=source_path,
                     timestamp=timestamps.iloc[index].to_pydatetime(),
-                    measured_value=float(values.iloc[index])
-                    if pd.notna(values.iloc[index])
-                    else "NaN",
-                    threshold=(
-                        f"{settings.temperature_min_c} to "
-                        f"{settings.temperature_max_c} °C"
-                    ),
+                    measured_value="NaN",
                 )
             )
 
@@ -73,7 +63,7 @@ def _temperature_evidence(
                 Evidence(
                     level=Status.REVIEW,
                     rule="temperature_rate",
-                    reason=f"{sensor.upper()} changed too quickly.",
+                    reason=f"{sensor.upper()} changed by an implausible amount.",
                     source_path=source_path,
                     timestamp=timestamps.iloc[index].to_pydatetime(),
                     measured_value=float(rates.iloc[index]),

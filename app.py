@@ -104,28 +104,31 @@ st.dataframe(pd.DataFrame(mapping_rows), hide_index=True, use_container_width=Tr
 
 st.header("4. Configure analysis")
 with st.expander("Advanced settings"):
-    minimum_temperature = st.number_input(
-        "Minimum physical temperature [°C]",
-        value=-10.0,
-    )
-    maximum_temperature = st.number_input(
-        "Maximum physical temperature [°C]",
-        value=250.0,
-    )
     maximum_rate = st.number_input(
-        "Maximum temperature rate [°C/s]",
+        "Maximum plausible temperature change [°C/s]",
         min_value=0.1,
         value=20.0,
+        help=(
+            "Marks sudden, physically implausible jumps as Review, for example "
+            "200 °C → 10 °C → 150 °C in consecutive seconds."
+        ),
     )
     missing_log_warning = st.number_input(
-        "Missing log warning [seconds]",
+        "Allowed difference between DATA and LOG duration [seconds]",
         min_value=0.0,
         value=300.0,
+        help=(
+            "DATA stores reported stress time. LOG coverage is calculated from "
+            "its first and last measurement. A larger gap becomes Review."
+        ),
+    )
+    st.info(
+        "Example: DATA reports 10 hours, but the board LOG covers only 9 hours "
+        "50 minutes. The 600-second gap exceeds the default 300-second tolerance, "
+        "so the board is marked Review."
     )
 
 settings = AnalysisSettings(
-    temperature_min_c=minimum_temperature,
-    temperature_max_c=maximum_temperature,
     temperature_max_rate_c_per_s=maximum_rate,
     missing_log_warning_seconds=missing_log_warning,
 )

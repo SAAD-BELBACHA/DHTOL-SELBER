@@ -3,8 +3,6 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class AnalysisSettings:
-    temperature_min_c: float = -10.0
-    temperature_max_c: float = 250.0
     temperature_max_rate_c_per_s: float = 20.0
     missing_log_warning_seconds: float = 300.0
     fault_confirmation_window_seconds: float = 2.0
