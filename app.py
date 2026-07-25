@@ -30,6 +30,14 @@ if "folder_path" not in st.session_state:
 if "analysis_result" not in st.session_state:
     st.session_state.analysis_result = None
 
+
+def browse_for_folder() -> None:
+    selected = choose_directory()
+    if selected:
+        st.session_state.folder_path = selected
+        st.session_state.analysis_result = None
+
+
 st.header("1. Select measurement folder")
 folder_column, button_column = st.columns([5, 1])
 with folder_column:
@@ -41,12 +49,7 @@ with folder_column:
 with button_column:
     st.write("")
     st.write("")
-    if st.button("Browse"):
-        selected = choose_directory()
-        if selected:
-            st.session_state.folder_path = selected
-            st.session_state.analysis_result = None
-            st.rerun()
+    st.button("Browse", on_click=browse_for_folder)
 
 root, folder_error = validate_folder(folder_value)
 if folder_error:
