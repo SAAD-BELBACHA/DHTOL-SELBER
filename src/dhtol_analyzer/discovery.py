@@ -20,7 +20,7 @@ def _matching_file(
         if dut_name and dut_name.lower() not in name:
             continue
         candidates.append(path)
-    return sorted(candidates, key=lambda path: path.name)[0] if candidates else None
+    return min(candidates, key=lambda path: path.name) if candidates else None
 
 
 def _matching_logs(
@@ -49,9 +49,7 @@ def discover_runs(root: Path) -> list[TestRunInput]:
 
         run_root = config_path.parent
         mtpx_path = _matching_file(run_root, ".mtpx", config.test_name)
-        planned_seconds = (
-            parse_planned_seconds(mtpx_path) if mtpx_path else None
-        )
+        planned_seconds = parse_planned_seconds(mtpx_path) if mtpx_path else None
         warnings = list(config.warnings)
         if planned_seconds is None:
             planned_seconds = 0.0
@@ -80,9 +78,7 @@ def discover_runs(root: Path) -> list[TestRunInput]:
             )
 
         board_log_paths = {
-            path.resolve()
-            for board in boards
-            for path in board.log_paths
+            path.resolve() for board in boards for path in board.log_paths
         }
         host_log_paths = sorted(
             [

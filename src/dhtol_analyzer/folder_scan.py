@@ -5,7 +5,6 @@ from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
-
 SUPPORTED_SUFFIXES = {".json", ".mtpx", ".data", ".log"}
 
 
